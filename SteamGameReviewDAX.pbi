@@ -52,3 +52,30 @@ VAR _ZeroCondition = IF(_Recommend = 0, 0, _Recommend)
 
 RETURN
         _ZeroCondition
+
+// Calculate the percentage by recommend
+Recommendation% = 
+VAR _TrueValue = CALCULATE(COUNT(recommendations[review_id]), recommendations[is_recommended] = True,CONTAINSSTRING(games[genres], SELECTEDVALUE(Genres[Genres])))
+VAR _AllValue = CALCULATE(COUNT(recommendations[review_id]), ALL(recommendations[is_recommended]), CONTAINSSTRING(games[genres], SELECTEDVALUE(Genres[Genres])))
+
+RETURN
+        IF(DIVIDE(_TrueValue,_AllValue, 0) = 0, 0, DIVIDE(_TrueValue,_AllValue, 0))
+
+// Calculate the Rating = Positive
+PositiveRating = 
+CALCULATE(
+        SUM(games[positive_ratings]),
+        CONTAINSSTRING(games[genres], SELECTEDVALUE(Genres[Genres])))
+
+// Calculate the total sum of positive and negating ratings
+MaxValue = 
+CALCULATE(SUM(games[positive_ratings]), CONTAINSSTRING(games[genres], SELECTEDVALUE(Genres[Genres]))) + 
+CALCULATE(SUM(games[negative_ratings]), CONTAINSSTRING(games[genres], SELECTEDVALUE(Genres[Genres])))
+
+// Find the genre Using Containstring to filter the table
+ConditionGenre = 
+VAR _SeelctedValue = SELECTEDVALUE(Genres[Genres])
+VAR _Condition = CALCULATE(COUNT(games[genres]),CONTAINSSTRING(games[genres],_SeelctedValue))
+
+RETURN
+        _Condition
